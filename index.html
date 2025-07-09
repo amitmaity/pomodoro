@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Pomodoro Timer</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Pomodoro Timer</h1>
+        </header>
+        
+        <div class="timer-container">
+            <div id="timer">25:00</div>
+            <div class="controls">
+                <button id="startBtn">Start</button>
+                <button id="pauseBtn" disabled>Pause</button>
+                <button id="resetBtn">Reset</button>
+            </div>
+            <div class="session-info">
+                Session: <span id="sessionCount">1</span>/4
+            </div>
+        </div>
+
+        <div class="task-section">
+            <h2>Current Task</h2>
+            <div class="task-input">
+                <input type="text" id="taskInput" placeholder="Enter task description...">
+                <button id="addTaskBtn">Add Task</button>
+            </div>
+            <div id="currentTask">No active task</div>
+        </div>
+
+        <div class="task-list">
+            <h2>Tasks</h2>
+            <ul id="tasks"></ul>
+        </div>
+
+        <div class="reports">
+            <h2>Daily Report</h2>
+            <div id="report">
+                <p>Total work time today: <span id="totalWorkTime">0</span> minutes</p>
+                <p>Completed tasks: <span id="completedTasks">0</span></p>
+                <div id="taskBreakdown">
+                    <h3>Task Breakdown</h3>
+                    <ul id="taskBreakdownList"></ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="timerSound" src="sounds/alert.mp3" preload="auto"></audio>
+    <script src="app.js"></script>
+</body>
+</html>
