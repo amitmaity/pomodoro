@@ -13,19 +13,7 @@ A Progressive Web App for the Pomodoro Technique, helping you manage your work a
 - 🎨 Clean, responsive design
 
 ## Getting Started
-
-1. Clone this repository
-2. Open `index.html` in a modern web browser
-3. Start using the Pomodoro Timer!
-
-### Or use a local server:
-
-```bash
-# Using Python's built-in server
-python3 -m http.server 8000
-```
-
-Then open `http://localhost:8000` in your browser.
+Click [here](https://amitmaity.github.io/pomodoro/) to try the app! https://amitmaity.github.io/pomodoro/
 
 ## How to Use
 
@@ -48,4 +36,4 @@ MIT
 
 ## Credits
 
-Created with ❤️ by [Your Name]
+Created with ❤️ by [Amit Maity](https://github.com/amitmaity).
