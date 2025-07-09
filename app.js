@@ -35,7 +35,10 @@ function loadData() {
     const savedTaskTimes = localStorage.getItem('pomodoroTaskTimes');
     
     if (savedTasks) tasks = JSON.parse(savedTasks);
-    if (savedSessions) sessionsCompleted = parseInt(savedSessions, 10);
+    if (savedSessions) {
+        sessionsCompleted = parseInt(savedSessions, 10);
+        sessionCount.textContent = `${sessionsCompleted}/8`;
+    }
     if (savedTaskTimes) taskTimes = JSON.parse(savedTaskTimes);
     
     updateTaskList();
@@ -90,7 +93,7 @@ function startTimer() {
                     }
                     
                     sessionsCompleted++;
-                    sessionCount.textContent = `${sessionsCompleted}/4`;
+                    sessionCount.textContent = `${sessionsCompleted}/8`;
                     
                     // Every 4th session is a long break
                     const isLongBreak = sessionsCompleted % 4 === 0;
