@@ -24,22 +24,36 @@ let isWorkTime = true;
 let sessionsCompleted = 0;
 
 // Task management
-let tasks = [];
 let currentTask = null;
 let taskTimes = {}; // To track time spent on each task
+let dailyStats = {}; // To track daily sessions and time worked
+const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+
+// Get today's stats
+function getDailyStats() {
+    const today = new Date().toISOString().split('T')[0];
+    if (!dailyStats[today]) {
+        dailyStats[today] = {
+            sessionsCompleted: 0,
+            timeWorked: 0,
+            taskTimes: {}
+        };
+    }
+    return dailyStats[today];
+}
 
 // Load data from localStorage
 function loadData() {
     const savedTasks = localStorage.getItem('pomodoroTasks');
-    const savedSessions = localStorage.getItem('pomodoroSessions');
-    const savedTaskTimes = localStorage.getItem('pomodoroTaskTimes');
+    const savedDailyStats = localStorage.getItem('pomodoroDailyStats');
     
     if (savedTasks) tasks = JSON.parse(savedTasks);
-    if (savedSessions) {
-        sessionsCompleted = parseInt(savedSessions, 10);
+    if (savedDailyStats) {
+        dailyStats = JSON.parse(savedDailyStats);
+        const todayStats = getDailyStats();
+        sessionsCompleted = todayStats.sessionsCompleted || 0;
         sessionCount.textContent = `${sessionsCompleted}/8`;
     }
-    if (savedTaskTimes) taskTimes = JSON.parse(savedTaskTimes);
     
     updateTaskList();
     updateReport();
@@ -47,9 +61,11 @@ function loadData() {
 
 // Save data to localStorage
 function saveData() {
+    const todayStats = getDailyStats();
+    todayStats.sessionsCompleted = sessionsCompleted;
+    
     localStorage.setItem('pomodoroTasks', JSON.stringify(tasks));
-    localStorage.setItem('pomodoroSessions', sessionsCompleted.toString());
-    localStorage.setItem('pomodoroTaskTimes', JSON.stringify(taskTimes));
+    localStorage.setItem('pomodoroDailyStats', JSON.stringify(dailyStats));
 }
 
 // Format time as MM:SS
@@ -91,11 +107,23 @@ function startTimer() {
                     // Record time spent on current task
                     if (currentTask) {
                         const taskId = currentTask.id;
+                        const todayStats = getDailyStats();
+                        
+                        // Update task times for today
+                        todayStats.taskTimes[taskId] = (todayStats.taskTimes[taskId] || 0) + workDuration;
+                        
+                        // Also update the global task times for backward compatibility
                         taskTimes[taskId] = (taskTimes[taskId] || 0) + workDuration;
+                        
+                        // Update total time worked today
+                        todayStats.timeWorked = (todayStats.timeWorked || 0) + workDuration;
+                        
                         saveData();
                     }
                     
                     sessionsCompleted++;
+                    const todayStats = getDailyStats();
+                    todayStats.sessionsCompleted = sessionsCompleted;
                     sessionCount.textContent = `${sessionsCompleted}/8`;
                     
                     // Every 4th session is a long break
@@ -247,39 +275,47 @@ function updateTaskList() {
 
 // Update the report section
 function updateReport() {
-    // Calculate total work time in minutes
-    const today = new Date().toISOString().split('T')[0];
-    let totalMinutes = 0;
-    const todayTasks = [];
+    // Update today's stats
+    const todayStats = getDailyStats();
+    const totalTime = todayStats.timeWorked || 0;
+    const hours = Math.floor(totalTime / 3600);
+    const minutes = Math.floor((totalTime % 3600) / 60);
     
-    // Filter tasks for today and calculate total time
-    tasks.forEach(task => {
-        const taskDate = new Date(task.createdAt).toISOString().split('T')[0];
-        if (taskDate === today) {
-            const taskId = task.id;
-            const taskTime = Math.floor((taskTimes[taskId] || 0) / 60); // Convert to minutes
-            totalMinutes += taskTime;
-            
-            if (taskTime > 0) {
-                todayTasks.push({
+    // Update the time display
+    if (totalTimeDisplay) {
+        totalTimeDisplay.textContent = `${hours}h ${minutes}m`;
+    }
+    
+    // Update task breakdown
+    if (taskBreakdownList) {
+        taskBreakdownList.innerHTML = '';
+        
+        // Get all tasks with time spent today
+        const tasksWithTime = [];
+        for (const taskId in todayStats.taskTimes) {
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                const timeSpent = todayStats.taskTimes[taskId];
+                const minutesSpent = Math.ceil(timeSpent / 60);
+                tasksWithTime.push({
                     text: task.text,
-                    time: taskTime
+                    time: minutesSpent
                 });
             }
         }
-    });
+        
+        // Update the task breakdown list
+        tasksWithTime.forEach(task => {
+            const li = document.createElement('li');
+            li.textContent = `${task.text}: ${task.time} minutes`;
+            taskBreakdownList.appendChild(li);
+        });
+    }
     
-    // Update the UI
-    totalWorkTime.textContent = totalMinutes;
-    completedTasksCount.textContent = tasks.filter(t => t.completed).length;
-    
-    // Update task breakdown
-    taskBreakdownList.innerHTML = '';
-    todayTasks.forEach(task => {
-        const li = document.createElement('li');
-        li.textContent = `${task.text}: ${task.time} minutes`;
-        taskBreakdownList.appendChild(li);
-    });
+    // Update completed tasks count if the element exists
+    if (completedTasksCount) {
+        completedTasksCount.textContent = tasks.filter(t => t.completed).length;
+    }
 }
 
 // Event Listeners
