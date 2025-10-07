@@ -78,6 +78,9 @@ function startTimer() {
             
             if (currentTime <= 0) {
                 clearInterval(timerInterval);
+                isRunning = false;
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
                 timerSound.play();
                 showNotification(
                     isWorkTime ? 'Work session completed!' : 'Break time is over!',
