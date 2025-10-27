@@ -107,23 +107,9 @@ function startTimer() {
                 );
                 
                 if (isWorkTime) {
-                    // Record time spent on current task
-                    if (currentTask) {
-                        const taskId = currentTask.id;
-                        const todayStats = getDailyStats();
-                        
-                        // Update task times for today
-                        todayStats.taskTimes[taskId] = (todayStats.taskTimes[taskId] || 0) + workDuration;
-                        
-                        // Also update the global task times for backward compatibility
-                        taskTimes[taskId] = (taskTimes[taskId] || 0) + workDuration;
-                        
-                        // Update total time worked today
-                        todayStats.timeWorked = (todayStats.timeWorked || 0) + workDuration;
-                        
-                        saveData();
-                    }
-                    
+                    // Update task time when session completes
+                    updateTaskTime(workDuration);
+
                     sessionsCompleted++;
                     const todayStats = getDailyStats();
                     todayStats.sessionsCompleted = sessionsCompleted;
@@ -141,12 +127,39 @@ function startTimer() {
     }
 }
 
+// Add this helper function to update task time
+function updateTaskTime(elapsedTime) {
+    if (currentTask && isWorkTime) {
+        const taskId = currentTask.id;
+        const todayStats = getDailyStats();
+
+        // Update task times for today
+        todayStats.taskTimes[taskId] = (todayStats.taskTimes[taskId] || 0) + elapsedTime;
+
+        // Update total time worked today
+        todayStats.timeWorked = (todayStats.timeWorked || 0) + elapsedTime;
+
+        saveData();
+        updateReport();
+    }
+}
+
 // Pause the timer
 function pauseTimer() {
-    clearInterval(timerInterval);
-    isRunning = false;
-    startBtn.disabled = false;
-    pauseBtn.disabled = true;
+    if (isRunning) {
+        clearInterval(timerInterval);
+        isRunning = false;
+        startBtn.disabled = false;
+        pauseBtn.disabled = true;
+
+        // Calculate elapsed time in this session
+        const elapsedTime = isWorkTime ?
+            workDuration - currentTime :
+            (isWorkTime ? shortBreakDuration : longBreakDuration) - currentTime;
+
+        // Update task time when paused
+        updateTaskTime(elapsedTime);
+    }
 }
 
 // Reset the timer
