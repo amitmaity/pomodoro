@@ -29,6 +29,9 @@ let taskTimes = {}; // To track time spent on each task
 let dailyStats = {}; // To track daily sessions and time worked
 const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
+// Add missing tasks declaration
+let tasks = [];
+
 // Get today's stats
 function getDailyStats() {
     const today = new Date().toISOString().split('T')[0];
@@ -162,7 +165,7 @@ function startWork() {
     currentTime = workDuration;
     updateDisplay();
     document.body.style.backgroundColor = '';
-    startTimer();
+    // Do not auto-start the timer here; let the user start the session manually
 }
 
 // Start a break (short or long)
@@ -171,7 +174,7 @@ function startBreak(isLongBreak = false) {
     currentTime = isLongBreak ? longBreakDuration : shortBreakDuration;
     updateDisplay();
     document.body.style.backgroundColor = '#f0f8ff';
-    startTimer();
+    // Do not auto-start the timer here; let the user start the break manually
 }
 
 // Show browser notification
@@ -281,9 +284,9 @@ function updateReport() {
     const hours = Math.floor(totalTime / 3600);
     const minutes = Math.floor((totalTime % 3600) / 60);
     
-    // Update the time display
-    if (totalTimeDisplay) {
-        totalTimeDisplay.textContent = `${hours}h ${minutes}m`;
+    // Update the time display (fixed variable name)
+    if (totalWorkTime) {
+        totalWorkTime.textContent = `${hours}h ${minutes}m`;
     }
     
     // Update task breakdown
@@ -293,7 +296,7 @@ function updateReport() {
         // Get all tasks with time spent today
         const tasksWithTime = [];
         for (const taskId in todayStats.taskTimes) {
-            const task = tasks.find(t => t.id === taskId);
+            const task = tasks.find(t => t.id === Number(taskId) || t.id === taskId);
             if (task) {
                 const timeSpent = todayStats.taskTimes[taskId];
                 const minutesSpent = Math.ceil(timeSpent / 60);
