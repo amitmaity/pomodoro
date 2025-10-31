@@ -274,17 +274,34 @@ function updateTaskList() {
         const li = document.createElement('li');
         li.className = `task-item ${task.completed ? 'completed' : ''} ${currentTask && currentTask.id === task.id ? 'active' : ''}`;
         
+        // Create checkbox for task completion
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'task-checkbox';
+        checkbox.checked = task.completed;
+        checkbox.onclick = (e) => {
+            e.stopPropagation();
+            toggleTaskCompletion(task.id);
+        };
+        
         const taskText = document.createElement('span');
+        taskText.className = 'task-text';
         taskText.textContent = task.text;
         taskText.onclick = () => setCurrentTask(task);
+        
+        const taskActions = document.createElement('div');
+        taskActions.className = 'task-actions';
         
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
         deleteBtn.textContent = '×';
         deleteBtn.onclick = (e) => deleteTask(task.id, e);
         
+        taskActions.appendChild(deleteBtn);
+        
+        li.appendChild(checkbox);
         li.appendChild(taskText);
-        li.appendChild(deleteBtn);
+        li.appendChild(taskActions);
         tasksList.appendChild(li);
     });
 }
@@ -315,15 +332,18 @@ function updateReport() {
                 const minutesSpent = Math.ceil(timeSpent / 60);
                 tasksWithTime.push({
                     text: task.text,
-                    time: minutesSpent
+                    time: minutesSpent,
+                    completed: task.completed
                 });
             }
         }
         
         // Update the task breakdown list
-        tasksWithTime.forEach(task => {
+        tasksWithTime.forEach(taskData => {
             const li = document.createElement('li');
-            li.textContent = `${task.text}: ${task.time} minutes`;
+            const statusIcon = taskData.completed ? '✓' : '○';
+            const statusClass = taskData.completed ? 'completed-status' : 'pending-status';
+            li.innerHTML = `<span class="${statusClass}">${statusIcon}</span> ${taskData.text}: ${taskData.time} minutes`;
             taskBreakdownList.appendChild(li);
         });
     }

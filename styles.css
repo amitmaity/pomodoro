@@ -125,6 +125,7 @@ li {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
 li:last-child {
@@ -134,6 +135,34 @@ li:last-child {
 .completed {
     text-decoration: line-through;
     color: #888;
+}
+
+.task-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.task-text {
+    flex: 1;
+    cursor: pointer;
+    user-select: none;
+}
+
+.task-text:hover {
+    color: var(--primary-color);
+}
+
+.task-actions {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.task-item.active {
+    background-color: #e8f5e9;
+    border-left: 3px solid var(--primary-color);
 }
 
 .delete-btn {
@@ -155,6 +184,23 @@ li:last-child {
 
 #taskBreakdown {
     margin-top: 15px;
+}
+
+.completed-status {
+    color: var(--primary-color);
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.pending-status {
+    color: #999;
+    margin-right: 5px;
+}
+
+#taskBreakdownList li {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 /* Responsive Design */
